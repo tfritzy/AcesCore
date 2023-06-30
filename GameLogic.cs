@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Schema;
 
 namespace AcesCore
@@ -72,11 +74,6 @@ namespace AcesCore
             }
 
             game.Players.Add(player);
-        }
-
-        public static Player CreatePlayer()
-        {
-            return new Player(id: IdGenerator.GenerateGenericId("plyr"));
         }
 
         public static bool CanGoOut(List<Card> cards, Card wild)

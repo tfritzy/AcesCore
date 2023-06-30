@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using AcesCore;
 
 namespace Schema
 {
     public class Game
     {
-        public string Id;
+        public string id;
         public List<Player> Players;
         public List<Card> Deck;
         public List<Card> Pile;
@@ -15,7 +16,7 @@ namespace Schema
 
         public Game(string id)
         {
-            Id = id;
+            this.id = id;
             Players = new();
             Deck = new();
             Pile = new();

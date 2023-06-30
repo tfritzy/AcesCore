@@ -1,3 +1,5 @@
+using System;
+
 namespace AcesCore
 {
     public class BadRequest : Exception
