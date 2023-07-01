@@ -98,17 +98,17 @@ namespace AcesCore
             }
         }
 
-        public static void DrawFromDeck(Game game, string playerId)
+        public static Card DrawFromDeck(Game game, string playerId)
         {
-            DrawFrom(game, game.Deck, playerId);
+            return DrawFrom(game, game.Deck, playerId);
         }
 
-        public static void DrawFromPile(Game game, string playerId)
+        public static Card DrawFromPile(Game game, string playerId)
         {
-            DrawFrom(game, game.Pile, playerId);
+            return DrawFrom(game, game.Pile, playerId);
         }
 
-        private static void DrawFrom(Game game, List<Card> cards, string playerId)
+        private static Card DrawFrom(Game game, List<Card> cards, string playerId)
         {
             Player? player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist");
             int index = game.Players.IndexOf(player);
@@ -119,6 +119,8 @@ namespace AcesCore
             Card card = cards.Last();
             cards.RemoveAt(cards.Count - 1);
             player.Hand.Add(card);
+
+            return card;
         }
 
         public static void Discard(Game game, string playerId, Card card)
