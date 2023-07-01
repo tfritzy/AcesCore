@@ -3,6 +3,13 @@ using AcesCore;
 
 namespace Schema
 {
+    public enum TurnPhase
+    {
+        Invalid,
+        Drawing,
+        Discarding,
+    }
+
     public class Game
     {
         public string id;
@@ -12,9 +19,11 @@ namespace Schema
         public int Round;
         public int TurnIndex;
         public GameState State;
+        public TurnPhase TurnPhase;
         public int NumRounds;
+        public GameSettings Settings;
 
-        public Game(string id)
+        public Game(string id, GameSettings? settings = null)
         {
             this.id = id;
             Players = new();
@@ -23,6 +32,8 @@ namespace Schema
             Round = 0;
             NumRounds = 10;
             State = GameState.Setup;
+            TurnPhase = TurnPhase.Invalid;
+            Settings = settings ?? new();
         }
     }
 }
