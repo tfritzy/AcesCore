@@ -6,11 +6,13 @@ namespace Schema
     public class Player
     {
         public string Id { get; private set; }
+        public string DisplayName { get; set; }
         public List<Card> Hand;
 
-        public Player(string id)
+        public Player(string id, string displayName)
         {
             Id = id;
+            DisplayName = displayName;
             Hand = new();
         }
     }

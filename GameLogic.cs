@@ -70,7 +70,7 @@ namespace AcesCore
         {
             if (game.Players.Select((p) => p.Id).Contains(player.Id))
             {
-                return;
+                throw new BadRequest("You're already in the game");
             }
 
             game.Players.Add(player);
