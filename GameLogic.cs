@@ -51,8 +51,13 @@ namespace AcesCore
             }
         }
 
-        public static void StartGame(Game game)
+        public static void StartGame(Game game, string userId)
         {
+            if (string.IsNullOrEmpty(userId) || game.Players.FirstOrDefault()?.Id != userId)
+            {
+                throw new BadRequest("Only the game owner can start the game.");
+            }
+
             InitDeck(game);
             DealCards(game);
             game.State = GameState.Playing;
