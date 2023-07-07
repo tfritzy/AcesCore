@@ -120,6 +120,7 @@ namespace AcesCore
         public static void AdvanceTurn(Game game)
         {
             game.TurnIndex += 1;
+            game.TurnIndex %= game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
         }
 
