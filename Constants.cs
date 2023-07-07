@@ -7,6 +7,7 @@ namespace AcesCore
 {
     public static class Constants
     {
-        public static readonly List<Card> FullDeck = Enum.GetValues(typeof(Card)).Cast<Card>().ToList();
+        public static readonly List<Card> FullDeck =
+            Enum.GetValues(typeof(Card)).Cast<Card>().Where(c => c != Card.INVALID).ToList();
     }
 }

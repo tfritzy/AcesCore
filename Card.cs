@@ -2,6 +2,8 @@ namespace AcesCore
 {
     public enum Card
     {
+        INVALID,
+
         TWO_OF_DIAMONDS,
         THREE_OF_DIAMONDS,
         FOUR_OF_DIAMONDS,
