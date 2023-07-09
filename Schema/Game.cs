@@ -22,6 +22,7 @@ namespace Schema
         public TurnPhase TurnPhase;
         public int NumRounds;
         public GameSettings Settings;
+        public List<Event> Events;
 
         public Game(string id, GameSettings? settings = null)
         {
@@ -29,6 +30,7 @@ namespace Schema
             Players = new();
             Deck = new();
             Pile = new();
+            Events = new();
             Round = 0;
             NumRounds = 10;
             State = GameState.Setup;

@@ -15,6 +15,11 @@ namespace AcesCore
             return game;
         }
 
+        public static Player FindPlayer(Game game, string userId)
+        {
+            return game.Players.FirstOrDefault(player => player.Id == userId) ?? throw new BadRequest("You don't exist.");
+        }
+
         public static int HandSizeForRound(int round)
         {
             return INITIAL_HAND_SIZE + round;
@@ -62,6 +67,8 @@ namespace AcesCore
             DealCards(game);
             game.State = GameState.Playing;
             game.TurnPhase = TurnPhase.Drawing;
+
+            game.Events.Add(new StartGameEvent());
         }
 
         public static void DealCards(Game game)
@@ -122,16 +129,23 @@ namespace AcesCore
             game.TurnIndex += 1;
             game.TurnIndex %= game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
+            game.Events.Add(new AdvanceTurnEvent());
         }
 
         public static Card DrawFromDeck(Game game, string playerId)
         {
-            return DrawFrom(game, game.Deck, playerId);
+            Player player = FindPlayer(game, playerId);
+            Card card = DrawFrom(game, game.Deck, playerId);
+            game.Events.Add(new DrawFromDeckEvent(player.DisplayName));
+            return card;
         }
 
         public static Card DrawFromPile(Game game, string playerId)
         {
-            return DrawFrom(game, game.Pile, playerId);
+            Player player = FindPlayer(game, playerId);
+            Card card = DrawFrom(game, game.Pile, playerId);
+            game.Events.Add(new DrawFromPileEvent(player.DisplayName));
+            return card;
         }
 
         private static Card DrawFrom(Game game, List<Card> cards, string playerId)
@@ -183,6 +197,8 @@ namespace AcesCore
             player.Hand.RemoveAt(cardIndex);
             game.Pile.Add(card);
             game.TurnPhase = TurnPhase.Discarding;
+
+            game.Events.Add(new DiscardEvent(player.DisplayName, card));
 
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
             if (extraCardCount <= 0)
