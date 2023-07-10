@@ -52,7 +52,7 @@ namespace AcesCore
 
             for (int i = 0; i < NumDecksNeeded(game.Round, game.Players.Count); i++)
             {
-                game.Deck.AddRange(Constants.FullDeck);
+                game.Deck.AddRange(Constants.FullDeck.Select((type) => new Card(type, i)));
             }
         }
 
@@ -99,6 +99,18 @@ namespace AcesCore
             }
 
             game.Players.Add(player);
+        }
+
+        public enum StreakType
+        {
+            StraightAsc,
+            StraightDesc,
+            Same
+        }
+
+        public static bool ContinuesStreak(Card card, Card lastCard, StreakType streakType)
+        {
+            return false;
         }
 
         public static bool CanGoOut(List<Card> cards, Card wild)
@@ -203,7 +215,7 @@ namespace AcesCore
             return card;
         }
 
-        public static void Discard(Game game, string playerId, Card card)
+        public static void Discard(Game game, string playerId, CardType cardType)
         {
             Player player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
             int index = game.Players.IndexOf(player);
@@ -214,11 +226,12 @@ namespace AcesCore
             if (player.Hand.Count - HandSizeForRound(game.Round) <= 0)
                 throw new BadRequest("You have insufficient cards to discard one.");
 
-            int cardIndex = player.Hand.IndexOf(card);
+            int cardIndex = player.Hand.FindIndex((c) => c.Type == cardType);
 
             if (cardIndex == -1)
                 throw new BadRequest("You don't have that card.");
 
+            Card card = player.Hand[cardIndex];
             player.Hand.RemoveAt(cardIndex);
             game.Pile.Add(card);
             game.TurnPhase = TurnPhase.Discarding;
