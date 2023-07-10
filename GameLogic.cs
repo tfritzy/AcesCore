@@ -103,13 +103,69 @@ namespace AcesCore
 
         public enum StreakType
         {
+            None,
             StraightAsc,
             StraightDesc,
             Same
         }
 
-        public static bool ContinuesStreak(Card card, Card lastCard, StreakType streakType)
+        public enum StepDir
         {
+            Asc,
+            Desc
+        };
+
+        public static bool AreOneStepApart(Card card1, Card card2, StepDir dir)
+        {
+            if (card1.Suit != card2.Suit)
+            {
+                return false;
+            }
+
+            if (dir == StepDir.Asc && card1.Value == CardValue.Ace && card2.Value == CardValue.Two)
+            {
+                return true;
+            }
+
+            if (dir == StepDir.Desc && card1.Value == CardValue.Two && card2.Value == CardValue.Ace)
+            {
+                return true;
+            }
+
+            int neededDelta = dir == StepDir.Asc ? 1 : -1;
+
+            return (int)card2.Value - (int)card1.Value == neededDelta;
+        }
+
+        public static bool ContinuesStreak(Card card, Card? lastCard, StreakType streakType)
+        {
+            if (lastCard == null)
+            {
+                return true;
+            }
+
+            if (streakType == StreakType.None)
+            {
+                return lastCard.Value == card.Value ||
+                       AreOneStepApart(lastCard, card, StepDir.Asc) ||
+                       AreOneStepApart(lastCard, card, StepDir.Desc);
+            }
+
+            if (streakType == StreakType.Same)
+            {
+                return lastCard.Value == card.Value;
+            }
+
+            if (streakType == StreakType.StraightAsc)
+            {
+                return AreOneStepApart(lastCard, card, StepDir.Asc);
+            }
+
+            if (streakType == StreakType.StraightDesc)
+            {
+                return AreOneStepApart(lastCard, card, StepDir.Desc);
+            }
+
             return false;
         }
 
