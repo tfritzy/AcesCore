@@ -106,9 +106,25 @@ namespace AcesCore
             return true;
         }
 
-        public static void GoOut(Game game, Player player)
+        public static void GoOut(Game game, string playerId)
         {
-            AdvanceRound(game);
+            if (game.Players[game.TurnIndex].Id != playerId)
+            {
+                throw new BadRequest("It's not your turn.");
+            }
+
+            Player player = FindPlayer(game, playerId);
+
+            int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
+            if (game.TurnPhase == TurnPhase.Drawing || extraCardCount > 0)
+            {
+                throw new BadRequest("You can't go out until you've drawn and discarded.");
+            }
+
+            game.PlayerWentOut ??= playerId;
+
+            game.Events.Add(new PlayerWentOutEvent(player.DisplayName));
+            AdvanceTurn(game);
         }
 
         public static void AdvanceRound(Game game)
@@ -116,12 +132,21 @@ namespace AcesCore
             game.Round += 1;
             InitDeck(game);
             DealCards(game);
+            game.TurnIndex = game.Round % game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
+
+            game.Events.Add(new AdvanceRoundEvent());
 
             if (game.Round > game.NumRounds)
             {
-                game.State = GameState.Finished;
+                EndGame(game);
             }
+        }
+
+        public static void EndGame(Game game)
+        {
+            game.State = GameState.Finished;
+            game.Events.Add(new GameEndEvent());
         }
 
         public static void AdvanceTurn(Game game)
@@ -199,11 +224,26 @@ namespace AcesCore
             game.TurnPhase = TurnPhase.Discarding;
 
             game.Events.Add(new DiscardEvent(player.DisplayName, card));
+        }
+
+        public static void EndTurn(Game game, string playerId)
+        {
+            Player player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
+
+            if (game.Players[game.TurnIndex]?.Id != playerId)
+                throw new BadRequest("It's not your turn.");
 
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
-            if (extraCardCount <= 0)
+            if (extraCardCount > 0)
             {
-                AdvanceTurn(game);
+                throw new BadRequest("You can't end your turn until you have discarded.");
+            }
+
+            AdvanceTurn(game);
+
+            if (game.PlayerWentOut != null && game.Players[game.TurnIndex].Id == game.PlayerWentOut)
+            {
+                AdvanceRound(game);
             }
         }
     }

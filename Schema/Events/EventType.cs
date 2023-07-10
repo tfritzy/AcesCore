@@ -5,5 +5,7 @@ public enum EventType
     DrawFromPile,
     Discard,
     AdvanceTurn,
-    AdvanceRound
+    PlayerWentOut,
+    AdvanceRound,
+    GameEndEvent
 }

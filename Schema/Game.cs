@@ -23,6 +23,7 @@ namespace Schema
         public int NumRounds;
         public GameSettings Settings;
         public List<Event> Events;
+        public string? PlayerWentOut;
 
         public Game(string id, GameSettings? settings = null)
         {
@@ -36,6 +37,7 @@ namespace Schema
             State = GameState.Setup;
             TurnPhase = TurnPhase.Invalid;
             Settings = settings ?? new();
+            PlayerWentOut = null;
         }
     }
 }
