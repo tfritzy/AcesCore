@@ -109,69 +109,158 @@ namespace AcesCore
             Same
         }
 
+        private static StreakType GetStreakType(Card cardA, Card cardB)
+        {
+            if (cardA.Value == cardB.Value)
+            {
+                return StreakType.Same;
+            }
+
+            if (AreNStepApart(cardA, cardB, StepDir.Asc, 1))
+            {
+                return StreakType.StraightAsc;
+            }
+
+            if (AreNStepApart(cardA, cardB, StepDir.Desc, 1))
+            {
+                return StreakType.StraightDesc;
+            }
+
+            return StreakType.None;
+        }
+
         public enum StepDir
         {
             Asc,
             Desc
         };
 
-        public static bool AreOneStepApart(Card card1, Card card2, StepDir dir)
+        public static bool AreNStepApart(Card card1, Card card2, StepDir dir, int n)
         {
             if (card1.Suit != card2.Suit)
             {
                 return false;
             }
 
-            if (dir == StepDir.Asc && card1.Value == CardValue.Ace && card2.Value == CardValue.Two)
-            {
-                return true;
-            }
+            int neededDelta = dir == StepDir.Asc ? n : -n;
 
-            if (dir == StepDir.Desc && card1.Value == CardValue.Two && card2.Value == CardValue.Ace)
-            {
-                return true;
-            }
+            int startValue =
+                card1.Value == CardValue.Ace &&
+                dir == StepDir.Asc
+                    ? 0 : (int)card1.Value;
 
-            int neededDelta = dir == StepDir.Asc ? 1 : -1;
+            int endValue =
+                card2.Value == CardValue.Ace &&
+                dir == StepDir.Desc
+                    ? 0 : (int)card2.Value;
 
-            return (int)card2.Value - (int)card1.Value == neededDelta;
+            return endValue - startValue == neededDelta;
         }
 
-        public static bool ContinuesStreak(Card card, Card? lastCard, StreakType streakType)
+        public static bool ContinuesStreak(Card streakStart, Card card, StreakType streakType, int size)
         {
-            if (lastCard == null)
-            {
-                return true;
-            }
-
             if (streakType == StreakType.None)
             {
-                return lastCard.Value == card.Value ||
-                       AreOneStepApart(lastCard, card, StepDir.Asc) ||
-                       AreOneStepApart(lastCard, card, StepDir.Desc);
+                return false;
             }
 
             if (streakType == StreakType.Same)
             {
-                return lastCard.Value == card.Value;
+                return streakStart.Value == card.Value;
             }
 
             if (streakType == StreakType.StraightAsc)
             {
-                return AreOneStepApart(lastCard, card, StepDir.Asc);
+                return AreNStepApart(streakStart, card, StepDir.Asc, size);
             }
 
             if (streakType == StreakType.StraightDesc)
             {
-                return AreOneStepApart(lastCard, card, StepDir.Desc);
+                return AreNStepApart(streakStart, card, StepDir.Desc, size);
             }
 
             return false;
         }
 
-        public static bool CanGoOut(List<Card> cards, Card wild)
+        public static int[] GetGroupSizeAtIndex(List<Card> cards, CardValue wild)
         {
-            return true;
+            int[] groupSizeAtIndex = new int[cards.Count];
+
+            for (int i = 0; i < cards.Count - 1; i++)
+            {
+                int size = 1;
+                StreakType streak = GetStreakType(cards[i], cards[i + 1]);
+
+                while (i + size < cards.Count &&
+                    ContinuesStreak(cards[i], cards[i + size], streak, size))
+                {
+                    size += 1;
+                }
+
+                groupSizeAtIndex[i] = size;
+            }
+
+            groupSizeAtIndex[cards.Count - 1] = 1;
+
+            return groupSizeAtIndex;
+        }
+
+        public struct Group
+        {
+            public int Index;
+            public int Size;
+        }
+
+        public static List<Group> GetBestGroups(int[] groupsPerIndex, int index, List<Group> groups, int[] best)
+        {
+            if (index >= groupsPerIndex.Length)
+            {
+                return groups;
+            }
+
+            int currentGrouped = groups.Sum((g) => g.Size);
+            if (best[index] > currentGrouped)
+            {
+                return groups;
+            }
+
+            int mostGrouped = 0;
+            List<Group> bestGroups = new(0);
+            for (int i = groupsPerIndex[index]; i > 0; i--)
+            {
+                var groupClone = new List<Group>(groups);
+
+                if (i > 2)
+                {
+                    groupClone.Add(new Group() { Index = index, Size = i });
+                }
+
+                var iGroups = GetBestGroups(groupsPerIndex, index + i, groupClone, best);
+                int grouped = iGroups.Sum((g) => g.Size);
+                if (grouped > mostGrouped)
+                {
+                    mostGrouped = grouped;
+                    bestGroups = iGroups;
+                }
+            }
+
+            best[index] = mostGrouped;
+
+            return bestGroups;
+        }
+
+        public static bool CanGoOut(Game game, string playerId, Card wild)
+        {
+            Player player = FindPlayer(game, playerId);
+
+            List<Group> bestGroups = GetBestGroups(
+                groupsPerIndex: GetGroupSizeAtIndex(player.Hand, wild.Value),
+                index: 0,
+                new List<Group>(),
+                new int[player.Hand.Count]
+            );
+
+            return bestGroups.Sum((g) => g.Size) == player.Hand.Count;
         }
 
         public static void GoOut(Game game, string playerId)
