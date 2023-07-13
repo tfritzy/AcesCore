@@ -1,14 +1,17 @@
 using System.Text.Json.Serialization;
 
-public class DrawFromPileEvent : Event
+namespace AcesCore
 {
-    public override EventType Type => EventType.DrawFromPile;
-
-    [JsonPropertyName("player")]
-    public string Player;
-
-    public DrawFromPileEvent(string displayName)
+    public class DrawFromPileEvent : Event
     {
-        Player = displayName;
+        public override EventType Type => EventType.DrawFromPile;
+
+        [JsonPropertyName("player")]
+        public string Player;
+
+        public DrawFromPileEvent(string displayName)
+        {
+            Player = displayName;
+        }
     }
 }

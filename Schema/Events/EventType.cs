@@ -1,11 +1,16 @@
-public enum EventType
+
+namespace AcesCore
 {
-    StartGame,
-    DrawFromDeck,
-    DrawFromPile,
-    Discard,
-    AdvanceTurn,
-    PlayerWentOut,
-    AdvanceRound,
-    GameEndEvent
+    public enum EventType
+    {
+        JoinGame,
+        StartGame,
+        DrawFromDeck,
+        DrawFromPile,
+        Discard,
+        AdvanceTurn,
+        PlayerWentOut,
+        AdvanceRound,
+        GameEndEvent
+    }
 }

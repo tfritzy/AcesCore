@@ -1,4 +1,8 @@
-public class StartGameEvent : Event
+
+namespace AcesCore
 {
-    public override EventType Type => EventType.StartGame;
+    public class StartGameEvent : Event
+    {
+        public override EventType Type => EventType.StartGame;
+    }
 }

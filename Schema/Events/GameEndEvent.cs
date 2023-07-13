@@ -1,4 +1,8 @@
-public class GameEndEvent : Event
+
+namespace AcesCore
 {
-    public override EventType Type => EventType.GameEndEvent;
+    public class GameEndEvent : Event
+    {
+        public override EventType Type => EventType.GameEndEvent;
+    }
 }

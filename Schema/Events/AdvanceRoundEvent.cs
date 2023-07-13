@@ -1,7 +1,10 @@
 using System.Text.Json.Serialization;
 using AcesCore;
 
-public class AdvanceRoundEvent : Event
+namespace AcesCore
 {
-    public override EventType Type => EventType.AdvanceRound;
+    public class AdvanceRoundEvent : Event
+    {
+        public override EventType Type => EventType.AdvanceRound;
+    }
 }

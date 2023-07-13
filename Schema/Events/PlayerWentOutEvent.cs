@@ -1,15 +1,18 @@
 using System.Text.Json.Serialization;
 using AcesCore;
 
-public class PlayerWentOutEvent : Event
+namespace AcesCore
 {
-    public override EventType Type => EventType.PlayerWentOut;
-
-    [JsonPropertyName("player")]
-    public string Player;
-
-    public PlayerWentOutEvent(string displayName)
+    public class PlayerWentOutEvent : Event
     {
-        Player = displayName;
+        public override EventType Type => EventType.PlayerWentOut;
+
+        [JsonPropertyName("player")]
+        public string Player;
+
+        public PlayerWentOutEvent(string displayName)
+        {
+            Player = displayName;
+        }
     }
 }

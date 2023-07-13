@@ -1,7 +1,10 @@
 using System.Text.Json.Serialization;
 using AcesCore;
 
-public class AdvanceTurnEvent : Event
+namespace AcesCore
 {
-    public override EventType Type => EventType.AdvanceTurn;
+    public class AdvanceTurnEvent : Event
+    {
+        public override EventType Type => EventType.AdvanceTurn;
+    }
 }

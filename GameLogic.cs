@@ -99,6 +99,8 @@ namespace AcesCore
             }
 
             game.Players.Add(player);
+
+            game.Events.Add(new JoinGameEvent(player.DisplayName));
         }
 
         public enum StreakType

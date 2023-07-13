@@ -1,14 +1,17 @@
 using System.Text.Json.Serialization;
 
-public class DrawFromDeckEvent : Event
+namespace AcesCore
 {
-    public override EventType Type => EventType.DrawFromDeck;
-
-    [JsonPropertyName("player")]
-    public string Player;
-
-    public DrawFromDeckEvent(string displayName)
+    public class DrawFromDeckEvent : Event
     {
-        Player = displayName;
+        public override EventType Type => EventType.DrawFromDeck;
+
+        [JsonPropertyName("player")]
+        public string Player;
+
+        public DrawFromDeckEvent(string displayName)
+        {
+            Player = displayName;
+        }
     }
 }
