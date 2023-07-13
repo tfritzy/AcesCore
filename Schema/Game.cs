@@ -33,7 +33,7 @@ namespace Schema
             Pile = new();
             Events = new();
             Round = 0;
-            NumRounds = 10;
+            NumRounds = 12;
             State = GameState.Setup;
             TurnPhase = TurnPhase.Invalid;
             Settings = settings ?? new();
