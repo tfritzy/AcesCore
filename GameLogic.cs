@@ -428,7 +428,7 @@ namespace AcesCore
             return card;
         }
 
-        public static void Discard(Game game, string playerId, CardType cardType)
+        public static Card Discard(Game game, string playerId, CardType cardType)
         {
             Player player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
             int index = game.Players.IndexOf(player);
@@ -450,6 +450,8 @@ namespace AcesCore
             game.TurnPhase = TurnPhase.Discarding;
 
             game.Events.Add(new DiscardEvent(player.DisplayName, card));
+
+            return card;
         }
 
         public static void EndTurn(Game game, string playerId)
