@@ -301,12 +301,12 @@ namespace AcesCore
             return bestGroups;
         }
 
-        public static bool CanGoOut(Game game, string playerId, Card wild)
+        public static bool CanGoOut(Game game, string playerId, CardValue wild)
         {
             Player player = FindPlayer(game, playerId);
 
             List<Group> bestGroups = GetBestGroups(
-                groupsPerIndex: GetGroupSizeAtIndex(player.Hand, wild.Value),
+                groupsPerIndex: GetGroupSizeAtIndex(player.Hand, wild),
                 index: 0,
                 new List<Group>(),
                 new int[player.Hand.Count]
@@ -328,6 +328,11 @@ namespace AcesCore
             if (game.TurnPhase == TurnPhase.Drawing || extraCardCount > 0)
             {
                 throw new BadRequest("You can't go out until you've drawn and discarded.");
+            }
+
+            if (!CanGoOut(game, playerId, CardValue.Three))
+            {
+                throw new BadRequest("You can't go out with your current hand.");
             }
 
             game.PlayerWentOut ??= playerId;
