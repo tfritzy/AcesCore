@@ -23,9 +23,13 @@ namespace AcesCore
         {
             get
             {
-                if ((int)Type > 0)
+                if ((int)Type > 0 && (int)Type < 53)
                 {
                     return (CardValue)(((int)Type - 1) % 13 + 1);
+                }
+                else if ((int)Type >= 53)
+                {
+                    return CardValue.Joker;
                 }
                 else
                 {

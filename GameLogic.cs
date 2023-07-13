@@ -109,19 +109,24 @@ namespace AcesCore
             Same
         }
 
-        private static StreakType GetStreakType(Card cardA, Card cardB)
+        private static StreakType GetStreakType(Card cardA, Card cardB, CardValue wild)
         {
+            if (IsWild(cardA, wild) || IsWild(cardB, wild))
+            {
+                return StreakType.None;
+            }
+
             if (cardA.Value == cardB.Value)
             {
                 return StreakType.Same;
             }
 
-            if (AreNStepApart(cardA, cardB, StepDir.Asc, 1))
+            if (IsInDirection(cardA, cardB, StepDir.Asc))
             {
                 return StreakType.StraightAsc;
             }
 
-            if (AreNStepApart(cardA, cardB, StepDir.Desc, 1))
+            if (IsInDirection(cardA, cardB, StepDir.Desc))
             {
                 return StreakType.StraightDesc;
             }
@@ -157,29 +162,56 @@ namespace AcesCore
             return endValue - startValue == neededDelta;
         }
 
-        public static bool ContinuesStreak(Card streakStart, Card card, StreakType streakType, int size)
+        public static bool IsInDirection(Card card1, Card card2, StepDir dir)
         {
-            if (streakType == StreakType.None)
+            if (card1.Suit != card2.Suit)
             {
                 return false;
             }
 
+            int startValue =
+                card1.Value == CardValue.Ace &&
+                dir == StepDir.Asc
+                    ? 0 : (int)card1.Value;
+
+            int endValue =
+                card2.Value == CardValue.Ace &&
+                dir == StepDir.Desc
+                    ? 0 : (int)card2.Value;
+
+            int neededVal = dir == StepDir.Asc ? 1 : -1;
+            return Math.Sign(endValue - startValue) == neededVal;
+        }
+
+
+        public static bool ContinuesStreak(Card prevCard, Card card, StreakType streakType, int gap, CardValue wild)
+        {
+            if (IsWild(card, wild) || IsWild(prevCard, wild))
+            {
+                return true;
+            }
+
             if (streakType == StreakType.Same)
             {
-                return streakStart.Value == card.Value;
+                return prevCard.Value == card.Value;
             }
 
             if (streakType == StreakType.StraightAsc)
             {
-                return AreNStepApart(streakStart, card, StepDir.Asc, size);
+                return AreNStepApart(prevCard, card, StepDir.Asc, gap);
             }
 
             if (streakType == StreakType.StraightDesc)
             {
-                return AreNStepApart(streakStart, card, StepDir.Desc, size);
+                return AreNStepApart(prevCard, card, StepDir.Desc, gap);
             }
 
             return false;
+        }
+
+        private static bool IsWild(Card card, CardValue wild)
+        {
+            return card.Value == wild || card.Value == CardValue.Joker;
         }
 
         public static int[] GetGroupSizeAtIndex(List<Card> cards, CardValue wild)
@@ -189,12 +221,32 @@ namespace AcesCore
             for (int i = 0; i < cards.Count - 1; i++)
             {
                 int size = 1;
-                StreakType streak = GetStreakType(cards[i], cards[i + 1]);
+                StreakType streak = StreakType.None;
+                int firstRealIndex = -1;
 
-                while (i + size < cards.Count &&
-                    ContinuesStreak(cards[i], cards[i + size], streak, size))
+                while (i + size < cards.Count)
                 {
-                    size += 1;
+                    int j = i + size;
+
+                    if (!IsWild(cards[j - 1], wild) && firstRealIndex == -1)
+                    {
+                        firstRealIndex = j - 1;
+                    }
+
+                    if (streak == StreakType.None && firstRealIndex != -1)
+                    {
+                        streak = GetStreakType(cards[firstRealIndex], cards[j], wild);
+                    }
+
+                    if (ContinuesStreak(cards[j - 1], cards[j], streak, 1, wild) &&
+                        (firstRealIndex == -1 || ContinuesStreak(cards[firstRealIndex], cards[j], streak, j - firstRealIndex, wild)))
+                    {
+                        size += 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 groupSizeAtIndex[i] = size;
