@@ -18,5 +18,9 @@ namespace AcesCore
             Player = displayName;
             Card = card;
         }
+
+        public DiscardEvent()
+        {
+        }
     }
 }

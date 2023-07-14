@@ -13,5 +13,9 @@ namespace AcesCore
         {
             Player = displayName;
         }
+
+        public DrawFromDeckEvent()
+        {
+        }
     }
 }

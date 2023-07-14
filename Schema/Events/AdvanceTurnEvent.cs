@@ -6,5 +6,9 @@ namespace AcesCore
     public class AdvanceTurnEvent : Event
     {
         public override EventType Type => EventType.AdvanceTurn;
+
+        public AdvanceTurnEvent()
+        {
+        }
     }
 }

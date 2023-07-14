@@ -6,5 +6,9 @@ namespace AcesCore
     public class AdvanceRoundEvent : Event
     {
         public override EventType Type => EventType.AdvanceRound;
+
+        public AdvanceRoundEvent()
+        {
+        }
     }
 }

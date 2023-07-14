@@ -14,5 +14,9 @@ namespace AcesCore
         {
             Player = displayName;
         }
+
+        public PlayerWentOutEvent()
+        {
+        }
     }
 }
