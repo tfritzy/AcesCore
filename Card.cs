@@ -49,6 +49,38 @@ namespace AcesCore
             Type = type;
             Deck = deck;
         }
+
+        public override string ToString()
+        {
+            return $"{Type} ({Deck})";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Card card)
+            {
+                return card.Type == Type && card.Deck == Deck;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Deck);
+        }
+
+        public static bool operator ==(Card left, Card right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Card left, Card right)
+        {
+            return !(left == right);
+        }
     }
 }
 
