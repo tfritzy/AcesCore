@@ -3,6 +3,7 @@ namespace AcesCore
 {
     public enum EventType
     {
+        Invalid,
         JoinGame,
         StartGame,
         DrawFromDeck,

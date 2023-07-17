@@ -10,6 +10,7 @@ namespace AcesCore
     [JsonConverter(typeof(EventConverter))]
     public abstract class Event
     {
+        [JsonProperty("type")]
         public abstract EventType Type { get; }
     }
 

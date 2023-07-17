@@ -10,6 +10,7 @@ namespace AcesCore
 
         [JsonPropertyName("deck")]
         public int Deck;
+
         public Suit Suit
         {
             get
