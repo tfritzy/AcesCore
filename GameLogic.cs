@@ -314,19 +314,37 @@ namespace AcesCore
             return CardValue.Invalid;
         }
 
-        public static bool CanGoOut(Player player, CardValue wild)
+        private static bool AreCardsEquivalent(Player player, List<Card> cards)
         {
-            List<Group> bestGroups = GetBestGroups(
-                groupsPerIndex: GetGroupSizeAtIndex(player.Hand, wild),
-                index: 0,
-                new List<Group>(),
-                new int[player.Hand.Count]
-            );
+            if (player.Hand.Count != cards.Count)
+            {
+                return false;
+            }
 
-            return bestGroups.Sum((g) => g.Size) == player.Hand.Count;
+            foreach (Card card in cards)
+            {
+                if (!player.Hand.Contains(card))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
-        public static void GoOut(Game game, string playerId)
+        public static bool CanGoOut(List<Card> cards, CardValue wild)
+        {
+            List<Group> bestGroups = GetBestGroups(
+                groupsPerIndex: GetGroupSizeAtIndex(cards, wild),
+                index: 0,
+                new List<Group>(),
+                new int[cards.Count]
+            );
+
+            return bestGroups.Sum((g) => g.Size) == cards.Count;
+        }
+
+        public static void GoOut(Game game, string playerId, List<Card> cards)
         {
             if (game.Players[game.TurnIndex].Id != playerId)
             {
@@ -335,13 +353,18 @@ namespace AcesCore
 
             Player player = FindPlayer(game, playerId);
 
+            if (!AreCardsEquivalent(player, cards))
+            {
+                throw new BadRequest("Your cards seem to be out of sync.");
+            }
+
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
             if (game.TurnPhase == TurnPhase.Drawing || extraCardCount > 0)
             {
                 throw new BadRequest("You can't go out until you've drawn and discarded.");
             }
 
-            if (!CanGoOut(player, GetWildForRound(game.Round)))
+            if (!CanGoOut(cards, GetWildForRound(game.Round)))
             {
                 throw new BadRequest("You can't go out with your current hand.");
             }
@@ -429,7 +452,7 @@ namespace AcesCore
             return card;
         }
 
-        public static Card Discard(Game game, string playerId, CardType cardType)
+        public static Card Discard(Game game, string playerId, Card card)
         {
             Player player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
             int index = game.Players.IndexOf(player);
@@ -440,12 +463,11 @@ namespace AcesCore
             if (player.Hand.Count - HandSizeForRound(game.Round) <= 0)
                 throw new BadRequest("You have insufficient cards to discard one.");
 
-            int cardIndex = player.Hand.FindIndex((c) => c.Type == cardType);
+            int cardIndex = player.Hand.FindIndex((c) => c == card);
 
             if (cardIndex == -1)
                 throw new BadRequest("You don't have that card.");
 
-            Card card = player.Hand[cardIndex];
             player.Hand.RemoveAt(cardIndex);
             game.Pile.Add(card);
             game.TurnPhase = TurnPhase.Discarding;

@@ -16,7 +16,7 @@ namespace AcesCore
 
     public class EventConverter : JsonConverter
     {
-        private static readonly Dictionary<EventType, Type> TypeMap = new Dictionary<EventType, Type>
+        private static readonly Dictionary<EventType, Type> TypeMap = new()
         {
             { EventType.AdvanceRound, typeof(AdvanceRoundEvent) },
             { EventType.AdvanceTurn, typeof(AdvanceTurnEvent) },
