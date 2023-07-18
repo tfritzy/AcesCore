@@ -27,6 +27,7 @@ namespace AcesCore
             { EventType.JoinGame, typeof(JoinGameEvent) },
             { EventType.PlayerWentOut, typeof(PlayerWentOutEvent) },
             { EventType.StartGame, typeof(StartGameEvent)},
+            { EventType.PlayerDoneForRound, typeof(PlayerDoneForRound)}
         };
 
         public override bool CanConvert(Type objectType)

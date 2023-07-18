@@ -371,6 +371,12 @@ namespace AcesCore
 
             game.PlayerWentOut ??= playerId;
 
+            game.Events.Add(
+                new PlayerDoneForRound(
+                    displayName: player.DisplayName,
+                    roundScore: 0,
+                    totalScore: player.Score));
+
             game.Events.Add(new PlayerWentOutEvent(player.DisplayName));
             AdvanceTurn(game);
         }
@@ -490,10 +496,21 @@ namespace AcesCore
                 throw new BadRequest("You can't end your turn until you have discarded.");
             }
 
-            if (!string.IsNullOrEmpty(game.PlayerWentOut) &&
-                !CanGoOut(player.Hand, GetWildForRound(game.Round)))
+            if (!string.IsNullOrEmpty(game.PlayerWentOut))
             {
-                player.Score += 1;
+                int roundScore = 1; // TODO: Calculate
+
+                if (!CanGoOut(player.Hand, GetWildForRound(game.Round)))
+                {
+                    player.Score += roundScore;
+                }
+
+                game.Events.Add(
+                    new PlayerDoneForRound(
+                        displayName: player.DisplayName,
+                        roundScore: roundScore,
+                        totalScore: player.Score));
+
             }
 
             AdvanceTurn(game);

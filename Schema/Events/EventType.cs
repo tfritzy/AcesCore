@@ -12,6 +12,7 @@ namespace AcesCore
         AdvanceTurn,
         PlayerWentOut,
         AdvanceRound,
+        PlayerDoneForRound,
         GameEndEvent
     }
 }
