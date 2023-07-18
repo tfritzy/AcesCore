@@ -490,6 +490,12 @@ namespace AcesCore
                 throw new BadRequest("You can't end your turn until you have discarded.");
             }
 
+            if (!string.IsNullOrEmpty(game.PlayerWentOut) &&
+                !CanGoOut(player.Hand, GetWildForRound(game.Round)))
+            {
+                player.Score += 1;
+            }
+
             AdvanceTurn(game);
 
             if (game.PlayerWentOut != null && game.Players[game.TurnIndex].Id == game.PlayerWentOut)
