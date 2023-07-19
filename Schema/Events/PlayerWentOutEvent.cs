@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using AcesCore;
+using Newtonsoft.Json;
 
 namespace AcesCore
 {
@@ -7,7 +8,7 @@ namespace AcesCore
     {
         public override EventType Type => EventType.PlayerWentOut;
 
-        [JsonPropertyName("player")]
+        [JsonProperty("player")]
         public string Player;
 
         public PlayerWentOutEvent(string displayName)

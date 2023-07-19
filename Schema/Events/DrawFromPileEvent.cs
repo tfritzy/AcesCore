@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace AcesCore
 {
@@ -6,7 +7,7 @@ namespace AcesCore
     {
         public override EventType Type => EventType.DrawFromPile;
 
-        [JsonPropertyName("player")]
+        [JsonProperty("player")]
         public string Player;
 
         public DrawFromPileEvent(string displayName)

@@ -1,14 +1,16 @@
+using System;
 using System.Text.Json.Serialization;
 using AcesCore;
+using Newtonsoft.Json;
 
 namespace AcesCore
 {
     public class Card
     {
-        [JsonPropertyName("type")]
+        [JsonProperty("type")]
         public CardType Type;
 
-        [JsonPropertyName("deck")]
+        [JsonProperty("deck")]
         public int Deck;
 
         public Suit Suit
