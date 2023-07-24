@@ -69,7 +69,7 @@ namespace AcesCore
             game.State = GameState.Playing;
             game.TurnPhase = TurnPhase.Drawing;
 
-            game.Events.Add(new StartGameEvent());
+            game.AddEvent(new StartGameEvent());
         }
 
         public static void DealCards(Game game)
@@ -101,7 +101,7 @@ namespace AcesCore
 
             game.Players.Add(player);
 
-            game.Events.Add(new JoinGameEvent(player.DisplayName));
+            game.AddEvent(new JoinGameEvent(player.DisplayName));
         }
 
         public enum StreakType
@@ -371,13 +371,13 @@ namespace AcesCore
 
             game.PlayerWentOut ??= playerId;
 
-            game.Events.Add(
+            game.AddEvent(
                 new PlayerDoneForRound(
                     displayName: player.DisplayName,
                     roundScore: 0,
                     totalScore: player.Score));
 
-            game.Events.Add(new PlayerWentOutEvent(player.DisplayName));
+            game.AddEvent(new PlayerWentOutEvent(player.DisplayName));
             AdvanceTurn(game);
         }
 
@@ -390,7 +390,7 @@ namespace AcesCore
             game.TurnPhase = TurnPhase.Drawing;
             game.PlayerWentOut = null;
 
-            game.Events.Add(new AdvanceRoundEvent());
+            game.AddEvent(new AdvanceRoundEvent());
 
             if (game.Round > game.NumRounds)
             {
@@ -401,7 +401,7 @@ namespace AcesCore
         public static void EndGame(Game game)
         {
             game.State = GameState.Finished;
-            game.Events.Add(new GameEndEvent());
+            game.AddEvent(new GameEndEvent());
         }
 
         public static void AdvanceTurn(Game game)
@@ -409,14 +409,14 @@ namespace AcesCore
             game.TurnIndex += 1;
             game.TurnIndex %= game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
-            game.Events.Add(new AdvanceTurnEvent());
+            game.AddEvent(new AdvanceTurnEvent());
         }
 
         public static Card DrawFromDeck(Game game, string playerId)
         {
             Player player = FindPlayer(game, playerId);
             Card card = DrawFrom(game, game.Deck, playerId);
-            game.Events.Add(new DrawFromDeckEvent(player.DisplayName));
+            game.AddEvent(new DrawFromDeckEvent(player.DisplayName));
             return card;
         }
 
@@ -424,7 +424,7 @@ namespace AcesCore
         {
             Player player = FindPlayer(game, playerId);
             Card card = DrawFrom(game, game.Pile, playerId);
-            game.Events.Add(new DrawFromPileEvent(player.DisplayName));
+            game.AddEvent(new DrawFromPileEvent(player.DisplayName));
             return card;
         }
 
@@ -478,7 +478,7 @@ namespace AcesCore
             game.Pile.Add(card);
             game.TurnPhase = TurnPhase.Discarding;
 
-            game.Events.Add(new DiscardEvent(player.DisplayName, card));
+            game.AddEvent(new DiscardEvent(player.DisplayName, card));
 
             return card;
         }
@@ -505,7 +505,7 @@ namespace AcesCore
                     player.Score += roundScore;
                 }
 
-                game.Events.Add(
+                game.AddEvent(
                     new PlayerDoneForRound(
                         displayName: player.DisplayName,
                         roundScore: roundScore,
