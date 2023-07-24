@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using AcesCore;
+using Newtonsoft.Json;
 
 namespace AcesCore
 {
@@ -7,10 +8,10 @@ namespace AcesCore
     {
         public override EventType Type => EventType.Discard;
 
-        [JsonPropertyName("player")]
+        [JsonProperty("player")]
         public string Player;
 
-        [JsonPropertyName("card")]
+        [JsonProperty("card")]
         public Card Card;
 
         public DiscardEvent(string displayName, Card card)
