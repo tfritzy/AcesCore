@@ -390,7 +390,7 @@ namespace AcesCore
             game.TurnPhase = TurnPhase.Drawing;
             game.PlayerWentOut = null;
 
-            game.AddEvent(new AdvanceRoundEvent());
+            game.AddEvent(new AdvanceRoundEvent(game.Round));
 
             if (game.Round > game.NumRounds)
             {
@@ -409,7 +409,7 @@ namespace AcesCore
             game.TurnIndex += 1;
             game.TurnIndex %= game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
-            game.AddEvent(new AdvanceTurnEvent());
+            game.AddEvent(new AdvanceTurnEvent(game.TurnIndex));
         }
 
         public static Card DrawFromDeck(Game game, string playerId)
@@ -493,7 +493,12 @@ namespace AcesCore
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
             if (extraCardCount > 0)
             {
-                throw new BadRequest("You can't end your turn until you have discarded.");
+                throw new BadRequest("You can't end your turn until you've discarded.");
+            }
+
+            if (game.TurnPhase == TurnPhase.Drawing)
+            {
+                throw new BadRequest("You can't end your turn before you've drawn.");
             }
 
             if (!string.IsNullOrEmpty(game.PlayerWentOut))
