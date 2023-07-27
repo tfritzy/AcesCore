@@ -371,6 +371,7 @@ namespace AcesCore
 
             game.PlayerWentOut ??= playerId;
 
+            player.ScorePerRound.Add(0);
             game.AddEvent(
                 new PlayerDoneForRound(
                     displayName: player.DisplayName,
@@ -503,12 +504,14 @@ namespace AcesCore
 
             if (!string.IsNullOrEmpty(game.PlayerWentOut))
             {
-                int roundScore = 1; // TODO: Calculate
+                int roundScore = 0; // TODO: Calculate
 
                 if (!CanGoOut(player.Hand, GetWildForRound(game.Round)))
                 {
+                    roundScore = 1;
                     player.Score += roundScore;
                 }
+                player.ScorePerRound.Add(roundScore);
 
                 game.AddEvent(
                     new PlayerDoneForRound(
