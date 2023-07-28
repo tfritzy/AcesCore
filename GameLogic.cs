@@ -101,7 +101,7 @@ namespace AcesCore
 
             game.Players.Add(player);
 
-            game.AddEvent(new JoinGameEvent(player.DisplayName));
+            game.AddEvent(new JoinGameEvent(player.DisplayName, player.Id));
         }
 
         public enum StreakType
@@ -374,11 +374,11 @@ namespace AcesCore
             player.ScorePerRound.Add(0);
             game.AddEvent(
                 new PlayerDoneForRound(
-                    displayName: player.DisplayName,
+                    playerId: player.Id,
                     roundScore: 0,
                     totalScore: player.Score));
 
-            game.AddEvent(new PlayerWentOutEvent(player.DisplayName));
+            game.AddEvent(new PlayerWentOutEvent(player.Id));
             AdvanceTurn(game);
         }
 
@@ -417,7 +417,7 @@ namespace AcesCore
         {
             Player player = FindPlayer(game, playerId);
             Card card = DrawFrom(game, game.Deck, playerId);
-            game.AddEvent(new DrawFromDeckEvent(player.DisplayName));
+            game.AddEvent(new DrawFromDeckEvent(player.Id));
             return card;
         }
 
@@ -425,7 +425,7 @@ namespace AcesCore
         {
             Player player = FindPlayer(game, playerId);
             Card card = DrawFrom(game, game.Pile, playerId);
-            game.AddEvent(new DrawFromPileEvent(player.DisplayName));
+            game.AddEvent(new DrawFromPileEvent(player.Id));
             return card;
         }
 
@@ -479,7 +479,7 @@ namespace AcesCore
             game.Pile.Add(card);
             game.TurnPhase = TurnPhase.Discarding;
 
-            game.AddEvent(new DiscardEvent(player.DisplayName, card));
+            game.AddEvent(new DiscardEvent(player.Id, card));
 
             return card;
         }
@@ -515,7 +515,7 @@ namespace AcesCore
 
                 game.AddEvent(
                     new PlayerDoneForRound(
-                        displayName: player.DisplayName,
+                        playerId: player.Id,
                         roundScore: roundScore,
                         totalScore: player.Score));
 

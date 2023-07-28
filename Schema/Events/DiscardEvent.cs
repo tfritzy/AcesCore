@@ -8,15 +8,15 @@ namespace AcesCore
     {
         public override EventType Type => EventType.Discard;
 
-        [JsonProperty("player")]
-        public string Player;
+        [JsonProperty("playerId")]
+        public string PlayerId;
 
         [JsonProperty("card")]
         public Card Card;
 
-        public DiscardEvent(string displayName, Card card)
+        public DiscardEvent(string playerId, Card card)
         {
-            Player = displayName;
+            PlayerId = playerId;
             Card = card;
         }
 

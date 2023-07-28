@@ -7,12 +7,12 @@ namespace AcesCore
     {
         public override EventType Type => EventType.DrawFromDeck;
 
-        [JsonProperty("player")]
-        public string Player;
+        [JsonProperty("playerId")]
+        public string PlayerId;
 
-        public DrawFromDeckEvent(string displayName)
+        public DrawFromDeckEvent(string playerId)
         {
-            Player = displayName;
+            PlayerId = playerId;
         }
 
         public DrawFromDeckEvent()

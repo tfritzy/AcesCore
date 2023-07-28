@@ -7,12 +7,12 @@ namespace AcesCore
     {
         public override EventType Type => EventType.DrawFromPile;
 
-        [JsonProperty("player")]
-        public string Player;
+        [JsonProperty("playerId")]
+        public string PlayerId;
 
-        public DrawFromPileEvent(string displayName)
+        public DrawFromPileEvent(string playerId)
         {
-            Player = displayName;
+            PlayerId = playerId;
         }
 
         public DrawFromPileEvent()

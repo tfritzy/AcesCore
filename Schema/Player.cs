@@ -19,13 +19,17 @@ namespace Schema
         public int Score;
         public List<int> ScorePerRound;
 
-        public Player(string id, string displayName)
+        [JsonProperty("token")]
+        public string Token;
+
+        public Player(string id, string displayName, string token)
         {
             Id = id;
             DisplayName = displayName;
             ScorePerRound = new();
             Hand = new();
             Score = 0;
+            Token = token;
         }
     }
 }

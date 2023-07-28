@@ -8,12 +8,12 @@ namespace AcesCore
     {
         public override EventType Type => EventType.PlayerWentOut;
 
-        [JsonProperty("player")]
-        public string Player;
+        [JsonProperty("playerId")]
+        public string PlayerId;
 
-        public PlayerWentOutEvent(string displayName)
+        public PlayerWentOutEvent(string playerId)
         {
-            Player = displayName;
+            PlayerId = playerId;
         }
 
         public PlayerWentOutEvent()

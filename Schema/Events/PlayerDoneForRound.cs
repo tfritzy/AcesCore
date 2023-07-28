@@ -10,8 +10,8 @@ namespace AcesCore
     {
         public override EventType Type => EventType.PlayerDoneForRound;
 
-        [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [JsonProperty("playerId")]
+        public string PlayerId { get; set; }
 
         [JsonProperty("roundScore")]
         public int RoundScore { get; set; }
@@ -19,9 +19,9 @@ namespace AcesCore
         [JsonProperty("totalScore")]
         public int TotalScore { get; set; }
 
-        public PlayerDoneForRound(string displayName, int roundScore, int totalScore)
+        public PlayerDoneForRound(string playerId, int roundScore, int totalScore)
         {
-            DisplayName = displayName;
+            PlayerId = playerId;
             RoundScore = roundScore;
             TotalScore = totalScore;
         }
