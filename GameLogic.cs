@@ -16,9 +16,9 @@ namespace AcesCore
             return game;
         }
 
-        public static Player FindPlayer(Game game, string userId)
+        public static Player FindPlayer(Game game, string token)
         {
-            return game.Players.FirstOrDefault(player => player.Id == userId) ?? throw new BadRequest("You don't exist.");
+            return game.Players.FirstOrDefault(player => player.Token == token) ?? throw new BadRequest("You don't exist.");
         }
 
         public static int HandSizeForRound(int round)
@@ -57,9 +57,9 @@ namespace AcesCore
             }
         }
 
-        public static void StartGame(Game game, string userId)
+        public static void StartGame(Game game, string token)
         {
-            if (string.IsNullOrEmpty(userId) || game.Players.FirstOrDefault()?.Id != userId)
+            if (string.IsNullOrEmpty(token) || game.Players.FirstOrDefault()?.Token != token)
             {
                 throw new BadRequest("Only the game owner can start the game.");
             }
@@ -344,14 +344,14 @@ namespace AcesCore
             return bestGroups.Sum((g) => g.Size) == cards.Count;
         }
 
-        public static void GoOut(Game game, string playerId, List<Card> cards)
+        public static void GoOut(Game game, string token, List<Card> cards)
         {
-            if (game.Players[game.TurnIndex].Id != playerId)
+            if (game.Players[game.TurnIndex].Token != token)
             {
                 throw new BadRequest("It's not your turn.");
             }
 
-            Player player = FindPlayer(game, playerId);
+            Player player = FindPlayer(game, token);
 
             if (!AreCardsEquivalent(player, cards))
             {
@@ -369,7 +369,7 @@ namespace AcesCore
                 throw new BadRequest("You can't go out with your current hand.");
             }
 
-            game.PlayerWentOut ??= playerId;
+            game.PlayerWentOut ??= player.Id;
 
             player.ScorePerRound.Add(0);
             game.AddEvent(
@@ -413,25 +413,25 @@ namespace AcesCore
             game.AddEvent(new AdvanceTurnEvent(game.TurnIndex));
         }
 
-        public static Card DrawFromDeck(Game game, string playerId)
+        public static Card DrawFromDeck(Game game, string token)
         {
-            Player player = FindPlayer(game, playerId);
-            Card card = DrawFrom(game, game.Deck, playerId);
+            Player player = FindPlayer(game, token);
+            Card card = DrawFrom(game, game.Deck, token);
             game.AddEvent(new DrawFromDeckEvent(player.Id));
             return card;
         }
 
-        public static Card DrawFromPile(Game game, string playerId)
+        public static Card DrawFromPile(Game game, string token)
         {
-            Player player = FindPlayer(game, playerId);
-            Card card = DrawFrom(game, game.Pile, playerId);
+            Player player = FindPlayer(game, token);
+            Card card = DrawFrom(game, game.Pile, token);
             game.AddEvent(new DrawFromPileEvent(player.Id));
             return card;
         }
 
-        private static Card DrawFrom(Game game, List<Card> cards, string playerId)
+        private static Card DrawFrom(Game game, List<Card> cards, string token)
         {
-            Player? player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
+            Player? player = FindPlayer(game, token);
             int index = game.Players.IndexOf(player);
 
             if (index != game.TurnIndex)
@@ -459,9 +459,9 @@ namespace AcesCore
             return card;
         }
 
-        public static Card Discard(Game game, string playerId, Card card)
+        public static Card Discard(Game game, string token, Card card)
         {
-            Player player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
+            Player player = FindPlayer(game, token);
             int index = game.Players.IndexOf(player);
 
             if (index != game.TurnIndex)
@@ -484,11 +484,11 @@ namespace AcesCore
             return card;
         }
 
-        public static void EndTurn(Game game, string playerId)
+        public static void EndTurn(Game game, string token)
         {
-            Player player = game.Players.Find((p) => p.Id == playerId) ?? throw new BadRequest("You don't exist.");
+            Player player = FindPlayer(game, token);
 
-            if (game.Players[game.TurnIndex]?.Id != playerId)
+            if (game.Players[game.TurnIndex]?.Token != token)
                 throw new BadRequest("It's not your turn.");
 
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
