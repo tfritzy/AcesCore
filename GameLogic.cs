@@ -344,6 +344,31 @@ namespace AcesCore
             return bestGroups.Sum((g) => g.Size) == cards.Count;
         }
 
+        public static int GetHandScore(List<Card> cards, CardValue wild)
+        {
+            List<Group> bestGroups = GetBestGroups(
+                groupsPerIndex: GetGroupSizeAtIndex(cards, wild),
+                index: 0,
+                new List<Group>(),
+                new int[cards.Count]
+            );
+
+            int score = 0;
+            for (int i = 0; i < cards.Count; i++)
+            {
+                Group groupStartingAtI = bestGroups.FirstOrDefault((g) => g.Index == i);
+                if (groupStartingAtI.Size > 0)
+                {
+                    i += groupStartingAtI.Size - 1;
+                    continue;
+                }
+
+                score += cards[i].Score;
+            }
+
+            return score;
+        }
+
         public static void GoOut(Game game, string token, List<Card> cards)
         {
             if (game.Players[game.TurnIndex].Token != token)
@@ -504,19 +529,21 @@ namespace AcesCore
 
             if (!string.IsNullOrEmpty(game.PlayerWentOut))
             {
-                int roundScore = 0; // TODO: Calculate
-
                 if (!CanGoOut(player.Hand, GetWildForRound(game.Round)))
                 {
-                    roundScore = 1;
+                    int roundScore = GetHandScore(player.Hand, GetWildForRound(game.Round));
+                    player.ScorePerRound.Add(roundScore);
                     player.Score += roundScore;
                 }
-                player.ScorePerRound.Add(roundScore);
+                else
+                {
+                    player.ScorePerRound.Add(0);
+                }
 
                 game.AddEvent(
                     new PlayerDoneForRound(
                         playerId: player.Id,
-                        roundScore: roundScore,
+                        roundScore: player.ScorePerRound.Last(),
                         totalScore: player.Score));
 
             }
