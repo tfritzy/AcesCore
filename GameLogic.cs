@@ -46,6 +46,18 @@ namespace AcesCore
             return numDecks;
         }
 
+        public static void Shuffle(List<Card> array)
+        {
+            Random random = new();
+
+            int n = array.Count;
+            while (n > 1)
+            {
+                int k = random.Next(n--);
+                (array[k], array[n]) = (array[n], array[k]);
+            }
+        }
+
         public static void InitDeck(Game game)
         {
             game.Pile = new();
@@ -55,6 +67,8 @@ namespace AcesCore
             {
                 game.Deck.AddRange(Constants.FullDeck.Select((type) => new Card(type, i)));
             }
+
+            Shuffle(game.Deck);
         }
 
         public static void StartGame(Game game, string token)
