@@ -13,6 +13,7 @@ namespace AcesCore
         [JsonProperty("deck")]
         public int Deck;
 
+        [JsonProperty("suit")]
         public Suit Suit
         {
             get
@@ -28,6 +29,7 @@ namespace AcesCore
             }
         }
 
+        [JsonProperty("value")]
         public CardValue Value
         {
             get
