@@ -13,6 +13,9 @@ namespace AcesCore
         [JsonProperty("deck")]
         public int Deck;
 
+        [JsonProperty("score")]
+        public int Score => GetScore();
+
         [JsonProperty("suit")]
         public Suit Suit
         {
@@ -47,6 +50,31 @@ namespace AcesCore
                     return CardValue.Invalid;
                 }
             }
+        }
+
+        public int GetScore()
+        {
+            return Value switch
+            {
+                CardValue.Two or
+                CardValue.Three or
+                CardValue.Four or
+                CardValue.Five or
+                CardValue.Six or
+                CardValue.Seven or
+                CardValue.Eight or
+                CardValue.Nine or
+                CardValue.Ten => (int)Value + 1,
+
+                CardValue.Jack or
+                CardValue.Queen or
+                CardValue.King => 10,
+
+                CardValue.Ace => 20,
+
+                CardValue.Joker => 50,
+                _ => 0,
+            };
         }
 
         public Card(CardType type, int deck)
