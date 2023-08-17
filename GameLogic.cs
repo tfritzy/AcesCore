@@ -113,6 +113,11 @@ namespace AcesCore
                 throw new BadRequest("You're already in the game");
             }
 
+            if (game.State != GameState.Setup)
+            {
+                throw new BadRequest("Sorry, the game has already started.");
+            }
+
             game.Players.Add(player);
 
             game.AddEvent(new JoinGameEvent(player.DisplayName, player.Id));
@@ -238,7 +243,11 @@ namespace AcesCore
             for (int i = 0; i < cards.Count - 1; i++)
             {
                 int size = 1;
-                StreakType streak = StreakType.None;
+                var possibleStreaks = new List<StreakType> {
+                    StreakType.StraightAsc,
+                    StreakType.StraightDesc,
+                    StreakType.Same
+                };
                 int firstRealIndex = -1;
 
                 while (i + size < cards.Count)
@@ -250,13 +259,18 @@ namespace AcesCore
                         firstRealIndex = j - 1;
                     }
 
-                    if (streak == StreakType.None && firstRealIndex != -1)
+                    for (int s = 0; s < possibleStreaks.Count; s++)
                     {
-                        streak = GetStreakType(cards[firstRealIndex], cards[j], wild);
+                        StreakType streak = possibleStreaks[s];
+                        if (!ContinuesStreak(cards[j - 1], cards[j], streak, 1, wild) ||
+                            !(firstRealIndex == -1 || ContinuesStreak(cards[firstRealIndex], cards[j], streak, j - firstRealIndex, wild)))
+                        {
+                            possibleStreaks.RemoveAt(s);
+                            s -= 1;
+                        }
                     }
 
-                    if (ContinuesStreak(cards[j - 1], cards[j], streak, 1, wild) &&
-                        (firstRealIndex == -1 || ContinuesStreak(cards[firstRealIndex], cards[j], streak, j - firstRealIndex, wild)))
+                    if (possibleStreaks.Count > 0)
                     {
                         size += 1;
                     }
@@ -481,7 +495,7 @@ namespace AcesCore
                 throw new BadRequest("You can't draw any more cards. You need to discard now.");
 
             if (game.TurnPhase != TurnPhase.Drawing)
-                throw new BadRequest("You can't draw after you start discarding.");
+                throw new BadRequest("You can't draw right now. You need to discard.");
 
             if (cards.Count == 0)
                 throw new BadRequest("You can't draw from an empty pile.");
