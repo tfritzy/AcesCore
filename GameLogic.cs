@@ -332,6 +332,46 @@ namespace AcesCore
             return bestGroups;
         }
 
+        public struct CardGroups
+        {
+            public List<List<Card>> GroupedCards;
+            public List<Card> UngroupedCards;
+        }
+
+        public static CardGroups GetCardGroups(List<Card> cards, CardValue wild)
+        {
+            int[] groupSizeAtIndex = GetGroupSizeAtIndex(cards, wild);
+            List<Group> bestGroups = GetBestGroups(
+                groupsPerIndex: groupSizeAtIndex,
+                index: 0,
+                new List<Group>(),
+                new int[cards.Count]
+            );
+
+            List<List<Card>> groupedCards = new();
+            List<Card> ungroupedCards = new();
+
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (bestGroups.Any((g) => g.Index == i))
+                {
+                    int groupSize = bestGroups.First((g) => g.Index == i).Size;
+                    groupedCards.Add(cards.GetRange(i, groupSize));
+                    i += groupSize - 1;
+                }
+                else
+                {
+                    ungroupedCards.Add(cards[i]);
+                }
+            }
+
+            return new CardGroups()
+            {
+                GroupedCards = groupedCards,
+                UngroupedCards = ungroupedCards
+            };
+        }
+
         public static CardValue GetWildForRound(int round)
         {
             if (round < 12)
@@ -425,11 +465,15 @@ namespace AcesCore
             game.PlayerWentOut ??= player.Id;
 
             player.ScorePerRound.Add(0);
+
+            var cardGroups = GetCardGroups(cards, GetWildForRound(game.Round));
             game.AddEvent(
                 new PlayerDoneForRound(
                     playerId: player.Id,
                     roundScore: 0,
-                    totalScore: player.Score));
+                    totalScore: player.Score,
+                    groupedCards: cardGroups.GroupedCards,
+                    ungroupedCards: cardGroups.UngroupedCards));
 
             game.AddEvent(new PlayerWentOutEvent(player.Id));
             AdvanceTurn(game);
@@ -568,12 +612,14 @@ namespace AcesCore
                     player.ScorePerRound.Add(0);
                 }
 
+                var cardGroups = GetCardGroups(player.Hand, GetWildForRound(game.Round));
                 game.AddEvent(
                     new PlayerDoneForRound(
                         playerId: player.Id,
                         roundScore: player.ScorePerRound.Last(),
-                        totalScore: player.Score));
-
+                        totalScore: player.Score,
+                        groupedCards: cardGroups.GroupedCards,
+                        ungroupedCards: cardGroups.UngroupedCards));
             }
 
             AdvanceTurn(game);

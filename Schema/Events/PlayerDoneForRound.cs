@@ -19,11 +19,25 @@ namespace AcesCore
         [JsonProperty("totalScore")]
         public int TotalScore { get; set; }
 
-        public PlayerDoneForRound(string playerId, int roundScore, int totalScore)
+        [JsonProperty("groupedCards")]
+        public List<List<Card>> GroupedCards { get; set; }
+
+        [JsonProperty("ungroupedCards")]
+        public List<Card> UngroupedCards;
+
+
+        public PlayerDoneForRound(
+            string playerId,
+            int roundScore,
+            int totalScore,
+            List<List<Card>> groupedCards,
+            List<Card> ungroupedCards)
         {
             PlayerId = playerId;
             RoundScore = roundScore;
             TotalScore = totalScore;
+            GroupedCards = groupedCards;
+            UngroupedCards = ungroupedCards;
         }
 
         public PlayerDoneForRound()
