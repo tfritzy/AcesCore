@@ -594,6 +594,12 @@ namespace AcesCore
             game.Pile.Add(card);
             game.TurnPhase = TurnPhase.Discarding;
 
+            int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
+            if (extraCardCount == 0)
+            {
+                game.TurnPhase = TurnPhase.Ending;
+            }
+
             game.AddEvent(new DiscardEvent(player.Id, card));
 
             return card;

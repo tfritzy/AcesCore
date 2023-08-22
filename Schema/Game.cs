@@ -8,6 +8,7 @@ namespace Schema
         Invalid,
         Drawing,
         Discarding,
+        Ending,
     }
 
     public class Game
