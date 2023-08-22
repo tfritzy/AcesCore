@@ -1,5 +1,4 @@
-
-
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace AcesCore
@@ -24,7 +23,6 @@ namespace AcesCore
 
         [JsonProperty("ungroupedCards")]
         public List<Card> UngroupedCards;
-
 
         public PlayerDoneForRound(
             string playerId,

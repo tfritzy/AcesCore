@@ -612,7 +612,10 @@ namespace AcesCore
                     player.ScorePerRound.Add(0);
                 }
 
-                var cardGroups = GetCardGroups(player.Hand, GetWildForRound(game.Round));
+                player.FinalHandPerRound.Add(player.Hand); // TODO update to correctly ordered cards
+                var cardGroups = GetCardGroups(
+                    player.Hand,
+                    GetWildForRound(game.Round));
                 game.AddEvent(
                     new PlayerDoneForRound(
                         playerId: player.Id,
