@@ -22,6 +22,9 @@ namespace Schema
         [JsonProperty("token")]
         public string Token;
 
+        [JsonProperty("handHistory")]
+        public List<List<Card>> HandHistory = new();
+
         public Player(string id, string displayName, string token)
         {
             Id = id;
@@ -30,6 +33,7 @@ namespace Schema
             Hand = new();
             Score = 0;
             Token = token;
+            HandHistory = new();
         }
     }
 }

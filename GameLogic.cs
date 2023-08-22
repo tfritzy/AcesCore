@@ -448,7 +448,7 @@ namespace AcesCore
 
             if (!AreCardsEquivalent(player, cards))
             {
-                throw new BadRequest("Your cards seem to be out of sync.");
+                throw new BadRequest("Your cards seem to be out of sync. Try refreshing.");
             }
 
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
@@ -466,6 +466,7 @@ namespace AcesCore
 
             player.ScorePerRound.Add(0);
 
+            player.HandHistory.Add(new List<Card>(cards));
             var cardGroups = GetCardGroups(cards, GetWildForRound(game.Round));
             game.AddEvent(
                 new PlayerDoneForRound(
@@ -476,7 +477,15 @@ namespace AcesCore
                     ungroupedCards: cardGroups.UngroupedCards));
 
             game.AddEvent(new PlayerWentOutEvent(player.Id));
-            AdvanceTurn(game);
+
+            if (game.Players.Count == 1)
+            {
+                AdvanceRound(game);
+            }
+            else
+            {
+                AdvanceTurn(game);
+            }
         }
 
         public static void AdvanceRound(Game game)
@@ -581,12 +590,15 @@ namespace AcesCore
             return card;
         }
 
-        public static void EndTurn(Game game, string token)
+        public static void EndTurn(Game game, string token, List<Card> hand)
         {
             Player player = FindPlayer(game, token);
 
             if (game.Players[game.TurnIndex]?.Token != token)
                 throw new BadRequest("It's not your turn.");
+
+            if (!AreCardsEquivalent(player, hand))
+                throw new BadRequest("Your cards seem to be out of sync. Try refreshing.");
 
             int extraCardCount = player.Hand.Count - HandSizeForRound(game.Round);
             if (extraCardCount > 0)
@@ -601,9 +613,9 @@ namespace AcesCore
 
             if (!string.IsNullOrEmpty(game.PlayerWentOut))
             {
-                if (!CanGoOut(player.Hand, GetWildForRound(game.Round)))
+                if (!CanGoOut(hand, GetWildForRound(game.Round)))
                 {
-                    int roundScore = GetHandScore(player.Hand, GetWildForRound(game.Round));
+                    int roundScore = GetHandScore(hand, GetWildForRound(game.Round));
                     player.ScorePerRound.Add(roundScore);
                     player.Score += roundScore;
                 }
@@ -612,10 +624,8 @@ namespace AcesCore
                     player.ScorePerRound.Add(0);
                 }
 
-                player.FinalHandPerRound.Add(player.Hand); // TODO update to correctly ordered cards
-                var cardGroups = GetCardGroups(
-                    player.Hand,
-                    GetWildForRound(game.Round));
+                player.HandHistory.Add(hand); // TODO update to correctly ordered cards
+                var cardGroups = GetCardGroups(hand, GetWildForRound(game.Round));
                 game.AddEvent(
                     new PlayerDoneForRound(
                         playerId: player.Id,
