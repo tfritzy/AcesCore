@@ -13,9 +13,10 @@ namespace AcesCore
         [JsonProperty("deck")]
         public int Deck;
 
-        [JsonProperty("score")]
+        [JsonIgnore]
         public int Score => GetScore();
 
+        [JsonIgnore]
         public Suit Suit
         {
             get
@@ -31,6 +32,7 @@ namespace AcesCore
             }
         }
 
+        [JsonIgnore]
         public CardValue Value
         {
             get
