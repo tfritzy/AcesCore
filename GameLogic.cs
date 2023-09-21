@@ -462,8 +462,6 @@ namespace AcesCore
                 throw new BadRequest("You can't go out with your current hand.");
             }
 
-            game.PlayerWentOut ??= player.Id;
-
             player.ScorePerRound.Add(0);
 
             player.HandHistory.Add(new List<Card>(cards));
@@ -478,13 +476,11 @@ namespace AcesCore
 
             game.AddEvent(new PlayerWentOutEvent(player.Id));
 
-            if (game.Players.Count == 1)
+            game.PlayerWentOutId ??= player.Id;
+            AdvanceTurn(game);
+            if (game.PlayerWentOutId == game.Players[game.TurnIndex].Id)
             {
                 AdvanceRound(game);
-            }
-            else
-            {
-                AdvanceTurn(game);
             }
         }
 
@@ -495,11 +491,11 @@ namespace AcesCore
             DealCards(game);
             game.TurnIndex = game.Round % game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
-            game.PlayerWentOut = null;
+            game.PlayerWentOutId = null;
 
             game.AddEvent(new AdvanceRoundEvent(game.Round));
 
-            if (game.Round > game.NumRounds)
+            if (game.Round >= game.NumRounds)
             {
                 EndGame(game);
             }
@@ -517,6 +513,11 @@ namespace AcesCore
             game.TurnIndex %= game.Players.Count;
             game.TurnPhase = TurnPhase.Drawing;
             game.AddEvent(new AdvanceTurnEvent(game.TurnIndex));
+
+            if (game.Deck.Count <= 5)
+            {
+                ShufflePileIntoDeck(game);
+            }
         }
 
         public static Card DrawFromDeck(Game game, string token)
@@ -524,6 +525,7 @@ namespace AcesCore
             Player player = FindPlayer(game, token);
             Card card = DrawFrom(game, game.Deck, token);
             game.AddEvent(new DrawFromDeckEvent(player.Id));
+
             return card;
         }
 
@@ -547,7 +549,10 @@ namespace AcesCore
             if (numDrawn >= MaxDrawable(game))
                 throw new BadRequest("You can't draw any more cards. You need to discard now.");
 
-            if (game.TurnPhase != TurnPhase.Drawing)
+            if (game.TurnPhase == TurnPhase.Ending)
+                throw new BadRequest("You can't draw right now. You need to end your turn.");
+
+            if (game.TurnPhase == TurnPhase.Discarding)
                 throw new BadRequest("You can't draw right now. You need to discard.");
 
             if (cards.Count == 0)
@@ -563,6 +568,16 @@ namespace AcesCore
             }
 
             return card;
+        }
+
+        private static void ShufflePileIntoDeck(Game game)
+        {
+            game.Deck.AddRange(game.Pile);
+            game.Pile = new();
+            Shuffle(game.Deck);
+            game.Pile.Add(game.Deck.Last());
+            game.Deck.RemoveAt(game.Deck.Count - 1);
+            game.AddEvent(new ReshuffleDeckEvent(game.Deck.Count, game.Pile));
         }
 
         public static Card Discard(Game game, string token, Card card)
@@ -617,7 +632,7 @@ namespace AcesCore
                 throw new BadRequest("You can't end your turn before you've drawn.");
             }
 
-            if (!string.IsNullOrEmpty(game.PlayerWentOut))
+            if (!string.IsNullOrEmpty(game.PlayerWentOutId))
             {
                 if (!CanGoOut(hand, GetWildForRound(game.Round)))
                 {
@@ -630,7 +645,7 @@ namespace AcesCore
                     player.ScorePerRound.Add(0);
                 }
 
-                player.HandHistory.Add(hand); // TODO update to correctly ordered cards
+                player.HandHistory.Add(hand);
                 var cardGroups = GetCardGroups(hand, GetWildForRound(game.Round));
                 game.AddEvent(
                     new PlayerDoneForRound(
@@ -643,7 +658,7 @@ namespace AcesCore
 
             AdvanceTurn(game);
 
-            if (game.PlayerWentOut != null && game.Players[game.TurnIndex].Id == game.PlayerWentOut)
+            if (game.PlayerWentOutId != null && game.Players[game.TurnIndex].Id == game.PlayerWentOutId)
             {
                 AdvanceRound(game);
             }

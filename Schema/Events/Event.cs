@@ -30,6 +30,7 @@ namespace AcesCore
             { EventType.JoinGame, typeof(JoinGameEvent) },
             { EventType.PlayerWentOut, typeof(PlayerWentOutEvent) },
             { EventType.StartGame, typeof(StartGameEvent)},
+            { EventType.ReshuffleDeck, typeof(ReshuffleDeckEvent)},
             { EventType.PlayerDoneForRound, typeof(PlayerDoneForRound)}
         };
 
