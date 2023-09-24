@@ -13,6 +13,7 @@ namespace AcesCore
         PlayerWentOut,
         AdvanceRound,
         PlayerDoneForRound,
+        ReshuffleDeck,
         GameEndEvent
     }
 }
