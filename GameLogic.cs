@@ -340,6 +340,15 @@ namespace AcesCore
 
         public static CardGroups GetCardGroups(List<Card> cards, CardValue wild)
         {
+            if (cards.Count == 0)
+            {
+                return new CardGroups()
+                {
+                    GroupedCards = new List<List<Card>>(),
+                    UngroupedCards = new List<Card>()
+                };
+            }
+
             int[] groupSizeAtIndex = GetGroupSizeAtIndex(cards, wild);
             List<Group> bestGroups = GetBestGroups(
                 groupsPerIndex: groupSizeAtIndex,
