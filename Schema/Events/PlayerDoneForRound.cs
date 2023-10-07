@@ -12,6 +12,9 @@ namespace AcesCore
         [JsonProperty("playerId")]
         public string PlayerId { get; set; }
 
+        [JsonProperty("round")]
+        public int Round { get; set; }
+
         [JsonProperty("roundScore")]
         public int RoundScore { get; set; }
 
@@ -26,12 +29,14 @@ namespace AcesCore
 
         public PlayerDoneForRound(
             string playerId,
+            int round,
             int roundScore,
             int totalScore,
             List<List<Card>> groupedCards,
             List<Card> ungroupedCards)
         {
             PlayerId = playerId;
+            Round = round;
             RoundScore = roundScore;
             TotalScore = totalScore;
             GroupedCards = groupedCards;
