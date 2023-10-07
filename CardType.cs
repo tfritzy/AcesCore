@@ -62,5 +62,7 @@ namespace AcesCore
 
         JOKER_A,
         JOKER_B,
+
+        CARDBACK,
     }
 }
