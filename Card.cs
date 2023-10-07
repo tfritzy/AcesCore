@@ -74,6 +74,29 @@ namespace AcesCore
             };
         }
 
+        public string GetShortName()
+        {
+            return Value switch
+            {
+                CardValue.Two or
+                CardValue.Three or
+                CardValue.Four or
+                CardValue.Five or
+                CardValue.Six or
+                CardValue.Seven or
+                CardValue.Eight or
+                CardValue.Nine or
+                CardValue.Ten => ((int)Value + 1).ToString(),
+
+                CardValue.Jack => "J",
+                CardValue.Queen => "Q",
+                CardValue.King => "K",
+                CardValue.Ace => "A",
+                CardValue.Joker => "Jo",
+                _ => "Invalid",
+            };
+        }
+
         public Card(CardType type, int deck)
         {
             Type = type;
