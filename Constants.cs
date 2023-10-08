@@ -8,6 +8,9 @@ namespace AcesCore
     public static class Constants
     {
         public static readonly List<CardType> FullDeck =
-            Enum.GetValues(typeof(CardType)).Cast<CardType>().Where(c => c != CardType.INVALID).ToList();
+            Enum.GetValues(typeof(CardType))
+                .Cast<CardType>()
+                .Where(c => c != CardType.INVALID && (int)c <= 54)
+                .ToList();
     }
 }

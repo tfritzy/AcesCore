@@ -478,6 +478,7 @@ namespace AcesCore
             game.AddEvent(
                 new PlayerDoneForRound(
                     playerId: player.Id,
+                    round: game.Round,
                     roundScore: 0,
                     totalScore: player.Score,
                     groupedCards: cardGroups.GroupedCards,
@@ -515,7 +516,6 @@ namespace AcesCore
             game.State = GameState.Finished;
             game.AddEvent(new GameEndEvent());
         }
-
         public static void AdvanceTurn(Game game)
         {
             game.TurnIndex += 1;
@@ -659,6 +659,7 @@ namespace AcesCore
                 game.AddEvent(
                     new PlayerDoneForRound(
                         playerId: player.Id,
+                        round: game.Round,
                         roundScore: player.ScorePerRound.Last(),
                         totalScore: player.Score,
                         groupedCards: cardGroups.GroupedCards,
